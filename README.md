@@ -8,6 +8,7 @@ three of the breakout groups:
 1. **Network Science**, Will Cunningham, Northeastern University. 
 2. **Supervised Machine Learning**, Sven Krippendorf, LMU Munich.
 3. **Reinforcement Learning**, Fabian Ruehle, Oxford.
+
 However, any participant that would like to contribute code to the meeting is welcome to. Please
 e-mail Jim Halverson for push access.
 
