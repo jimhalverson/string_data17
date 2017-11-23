@@ -18,6 +18,7 @@ class GameEnv:
         plt.ioff()  # there is currently a bug for Mac users which requires turning this off
         self.world_canvas = plt.figure("Gridworld")
         self.world_canvas.suptitle('Blue: Worker, Red: Pitfalls, Green: Exit')
+        self.im = None
         plt.axis("off")
         self.objects = []
         self.initial_x = 0
@@ -28,7 +29,7 @@ class GameEnv:
         # *)   -1 for each step (penalty to solve it quickly)
         # *)  -50 for each pitfall (penalty for falling into the pit)
         # *) +100 for finding the exit (reward for solving the maze)
-        # *)    0 for running into a wall / not moving at all
+        # *)   -2 for running into a wall / not moving at all
         self.step_penalty = -1.
         self.pitfall_penalty = -50.
         self.exit_reward = 100.
@@ -55,16 +56,13 @@ class GameEnv:
         # 2.) The second parameter is the reward / penalty:
         # 3.) The third parameter is the position of the object in the world
         # 4.) Ignore the other parameters, they are just used for drawing the world (box sizes and color)
-        worker = GameOb('worker', None, self.new_position(), 1, [0,0,1])
-        self.objects.append(worker)
-        maze_exit = GameOb('exit', self.exit_reward, self.new_position(), 1, [0,1,0])
+        maze_exit = GameOb('exit', self.exit_reward, self.new_position(), 1, [0, 1, 0, 1])
         self.objects.append(maze_exit)
-        pitfall1 = GameOb('pitfall', self.pitfall_penalty, self.new_position(), 1, [1,0,0])
-        self.objects.append(pitfall1)
-        pitfall2 = GameOb('pitfall', self.pitfall_penalty, self.new_position(), 1, [1,0,0])
-        self.objects.append(pitfall2)
-        pitfall3 = GameOb('pitfall', self.pitfall_penalty, self.new_position(), 1, [1,0,0])
-        self.objects.append(pitfall3)
+        worker = GameOb('worker', None, self.new_position(), 1, [0, 0, 1, 1])
+        self.objects.append(worker)
+        for i in range(12):  # add pitfalls
+            pitfall = GameOb('pitfall', self.pitfall_penalty, self.new_position(), 1, [1, 0, 0, 1])
+            self.objects.append(pitfall)
 
         # store the initial (x,y) coordinates for a reset
         self.initial_x = worker.x
@@ -78,7 +76,7 @@ class GameEnv:
 
         # plot the world
         plt.ioff()
-        plt.imshow(world, interpolation="nearest")
+        self.im = plt.imshow(world, interpolation="nearest")
 
         return world
 
@@ -93,8 +91,6 @@ class GameEnv:
                 obj.x = self.initial_x
                 obj.y = self.initial_y
                 break
-
-        world = self.render_world()
 
     # move through the world
     # 0 - up, 1 - down, 2 - left, 3 - right
@@ -132,7 +128,7 @@ class GameEnv:
         # update to new position
         for i in range(len(self.objects)):
             if self.objects[i].name == 'worker':
-                self.objects[0] = worker
+                self.objects[i] = worker
                 break
 
         # check whether new field is a special field (exit/pitfall) and compute reward/penalty
@@ -166,8 +162,10 @@ class GameEnv:
 
         # this just updates the graphic output of the world
         if update_view:
-            world = self.render_world()
-            plt.imshow(world, interpolation="nearest")
+            # world = self.render_world()
+            # plt.imshow(world, interpolation="nearest")
+            self.im.set_array(self.render_world())
+            plt.draw()
 
         # return the new state, the penalty/reward for the move and whether gridworld is solved/given up on
         return self.get_state(), reward, done
@@ -215,26 +213,29 @@ class GameEnv:
         return points[location]
 
     def render_world(self):
-        a = np.zeros([self.sizeY + 2, self.sizeX + 2, 3])
+        a = np.zeros([self.sizeY + 2, self.sizeX + 2, 4])
+        a[0:, 0, 3] = 1  # left wall
+        a[0, 0:, 3] = 1  # top wall
+        a[0:, 10, 3] = 1  # right wall
+        a[10, 0:, 3] = 1  # bottom wall
         a[1:-1, 1:-1, :] = 1
         for item in self.objects:
-            for i in range(len(item.channel)):
-                a[item.y + 1:item.y + item.size + 1, item.x + 1:item.x + item.size + 1, i] = item.channel[i]
-
-        b = scipy.misc.imresize(a[:, :, 0], [84, 84, 1], interp='nearest')
-        c = scipy.misc.imresize(a[:, :, 1], [84, 84, 1], interp='nearest')
-        d = scipy.misc.imresize(a[:, :, 2], [84, 84, 1], interp='nearest')
-        a = np.stack([b, c, d], axis=2)
-
+            if a[item.y + 1, item.x + 1, 0] == 1 and a[item.y + 1, item.x + 1, 1] == 1 and a[item.y + 1, item.x + 1, 2] == 1:  # is completely white
+                for i in range(len(item.channel)): a[item.y + 1:item.y + item.size + 1, item.x + 1:item.x + item.size + 1, i] = item.channel[i]
+            else:  # other object on the field, overlay worker with pitfalls / exit
+                for i in range(len(item.channel)):
+                    if a[item.y + 1, item.x + 1, i] == 0:
+                        a[item.y + 1:item.y + item.size + 1, item.x + 1:item.x + item.size + 1, i] += item.channel[i]
+        a = scipy.misc.imresize(a[:, :], [84, 84, 4], interp='nearest', mode="RGBA")
         return a
 
 
 # This represents an object in the game: worker, pitfall, exit
 class GameOb:
-    def __init__(self, name, reward, coordinates, size, RGB):
+    def __init__(self, name, reward, coordinates, size, RGBA):
         self.x = coordinates[0]
         self.y = coordinates[1]
         self.size = size
-        self.channel = RGB
+        self.channel = RGBA
         self.reward = reward
         self.name = name
