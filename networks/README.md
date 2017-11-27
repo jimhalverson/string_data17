@@ -12,7 +12,9 @@ We will study several topics in this breakout group:
 
 ## What do you need to be prepared?
 This tutorial uses ipython notebooks with the python-igraph library. You will need to have both installed to run the code.
+
 *ipython* - https://ipython.org/install.html
+
 *igraph* - http://igraph.org/python/
 
 ## Discussion questions
