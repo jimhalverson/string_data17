@@ -20,4 +20,6 @@ This tutorial uses ipython notebooks with the python-igraph library. You will ne
 ## Discussion questions
 1. What objects in string theory can be modeled as graphs, i.e., a collection of objects with relations? What about as statistical ensembles of graphs?
 2. On the string landscape, what types of diffusion processes can you imagine occuring? Ideas for toy models?
-3. What 
+3. How might you model information entanglement using networks?
+4. What measures of centrality would we expect to be important in these models?
+5. In network science, we also think about information routing, community detection and link prediction, and network resilience in the face of link or node failures. How might these concepts apply to string theory?
