@@ -17,7 +17,9 @@ In order to exemplify the idea behind reinforcement learning, we will set up a v
 
 ## Discussion
 Possible questions we can discuss are:
- - Is gridworld a good analogy to the actual string landscape? E.g. there are (believed to be) more than one Standard Model-like solution in a given string construction?
- - What could gridworld look like for F-Theory model building, intersecting brane models in IIA/B, Heterotic CYs with vector bundles, Heterotic SCFTs (free fermionic, orbifolds), ...?
- - How does it compare to other machine learning techniques?
- - What are the best methods to use in RL (SARSA, A3C, Wolpertinger, Rainbow, ...)?
+ - In what ways is gridworld a good or bad analogy to the string landscape? 
+ - What could a gridworld look like for F-Theory model building, intersecting brane models in IIA/B, Heterotic CYs with vector bundles, Heterotic SCFTs (free fermionic, orbifolds), etc? 
+ - How does reinforcement learning compare to other machine learning techniques? 
+ - What are the relative advantages of different reinforcement learning algorithms (SARSA, DQN, DDPG, A3C, Wolpertinger, Rainbow, …)? How might the relative advantages be utilized in string theory? 
+ - How might reinforcement learning be useful elsewhere in the landscape, such as in inflationary setups? 
+
