@@ -4,7 +4,7 @@
 
 Classify data in two classes for problems like this:
 
-<img src="string_data17/supervised/abovebelow1.jpg" width="250" alt="line example" />
+<img src="~/string_data17/supervised/abovebelow1.jpg" width="250" alt="line example" />
 <img src="string_data17/supervised/abovebelow2.jpg" width="250" alt="line example" />
 <img src="string_data17/supervised/abovebelow3.jpg" width="250" alt="line example" />
 
