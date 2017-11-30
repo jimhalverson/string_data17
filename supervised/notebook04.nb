@@ -1,0 +1,888 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 11.2' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     41805,        880]
+NotebookOptionsPosition[     39671,        836]
+NotebookOutlinePosition[     40048,        853]
+CellTagsIndexPosition[     40005,        850]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["A simple NN for classifying handwritten digit recognition", "Title",
+ CellChangeTimes->{{3.721038766960884*^9, 
+  3.7210388036205597`*^9}},ExpressionUUID->"d299117a-2b33-492f-82b8-\
+2b4b68a8cea5"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"trainingData", "=", 
+   RowBox[{"ExampleData", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"\"\<MachineLearning\>\"", ",", "\"\<MNIST\>\""}], "}"}], ",", 
+     "\"\<TrainingData\>\""}], "]"}]}], ";", 
+  RowBox[{"testData", "=", 
+   RowBox[{"ExampleData", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"\"\<MachineLearning\>\"", ",", "\"\<MNIST\>\""}], "}"}], ",", 
+     "\"\<TestData\>\""}], "]"}]}], ";"}]], "Input",ExpressionUUID->"bb7cf3cf-\
+0701-4cf3-97a1-138326ded789"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"RandomSample", "[", 
+  RowBox[{"trainingData", ",", "5"}], "]"}]], "Input",ExpressionUUID->\
+"8d3be260-db7d-4b1f-93ba-616bffc3710e"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{
+    GraphicsBox[
+     TagBox[RasterBox[CompressedData["
+1:eJxTTMoPSmNiYGAo5gASQYnljkVFiZXBAkBOaF5xZnpeaopnXklqemqRRRJI
+mQwU/x9mYJ4kI4PUfGwyX31YFObPD2OZjkVuBZPSnf//f1VqfcOUC+FYDqLO
+ScVhSN3kyIAwjgdhyL0QT8FiGBTM5fDr7Q3xO4ZVcrmmMBMjkxsOrX92xjNN
+w2lwJB45W8Z3uKROMLr9wyU3iRHT4zAQwHgel9QLXre/uOTmMcXgNHIe0zk8
+cjil/u9n+o1T7k94Nm6NqAAAp7fkhw==
+       "], {{0, 28}, {28, 0}}, {0, 255},
+       ColorFunction->GrayLevel],
+      BoxForm`ImageTag["Byte", ColorSpace -> Automatic, Interleaving -> None],
+      
+      Selectable->False],
+     DefaultBaseStyle->"ImageGraphics",
+     ImageSizeRaw->{28, 28},
+     PlotRange->{{0, 28}, {0, 28}}], "\[Rule]", "9"}], ",", 
+   RowBox[{
+    GraphicsBox[
+     TagBox[RasterBox[CompressedData["
+1:eJxTTMoPSmNiYGAo5gASQYnljkVFiZXBAkBOaF5xZnpeaopnXklqemqRRRJI
+mQwU/x9wwL0cp9ROVpxyT/SZcMrtYWJZj0uuhMkAl1SvENNdXHLZTEn/cEjt
+ZuS9jUubHYMLLqm7IoxLcEg99WXUx6XtEhPTBBxSvwKYmN7gkNvJxLQUl5Gt
+TEz3cMnpMdn/wCF1hVf8Mi5tyUx6uKT+WzDV45Gbg1OOPgAAIBbq+g==
+       "], {{0, 
+       28}, {28, 0}}, {0, 255},
+       ColorFunction->GrayLevel],
+      BoxForm`ImageTag["Byte", ColorSpace -> Automatic, Interleaving -> None],
+      
+      Selectable->False],
+     DefaultBaseStyle->"ImageGraphics",
+     ImageSizeRaw->{28, 28},
+     PlotRange->{{0, 28}, {0, 28}}], "\[Rule]", "1"}], ",", 
+   RowBox[{
+    GraphicsBox[
+     TagBox[RasterBox[CompressedData["
+1:eJxTTMoPSmNiYGAo5gASQYnljkVFiZXBAkBOaF5xZnpeaopnXklqemqRRRJI
+mQwU/x9G4Pe39UsKCpYUZARbyqV9Q5FarsEEAoxgUuIDstR7MaCItLS0JFhu
+FqqRJxqPfQdSf4+ZMDF5vMVu7SJ+JrFX2KX+GDMxdeFw7QZuJpEjOOTcmJgy
+cEidYWQy/I1DroKRvRGXNhaGdBxST0OZ1F/ikJvFxDQDh9QlKSb1N9ilvocz
+8S3BoW0xE1MMDqn/pkxql3FIHWETXIFLWxBTHi6pVW4pH3HJYQUAEmDHQQ==
+
+       "], {{0, 28}, {28, 0}}, {0, 255},
+       ColorFunction->GrayLevel],
+      BoxForm`ImageTag["Byte", ColorSpace -> Automatic, Interleaving -> None],
+      
+      Selectable->False],
+     DefaultBaseStyle->"ImageGraphics",
+     ImageSizeRaw->{28, 28},
+     PlotRange->{{0, 28}, {0, 28}}], "\[Rule]", "7"}], ",", 
+   RowBox[{
+    GraphicsBox[
+     TagBox[RasterBox[CompressedData["
+1:eJxTTMoPSmNiYGAo5gASQYnljkVFiZXBAkBOaF5xZnpeaopnXklqemqRRRJI
+mQwU/x9A8PFto4MRA6PfHwyZFx0STBAwBV3qnQITDKShy72VAYoqtq7AJvf/
+HFDy0v/tQLl0TKe8fvToTzcfE5PqXSzu/Puzh5OJibkfmx8KQA5h68bqPxuQ
+nOZnrHIL1EGSc7HK/X8ZyczEJHgNu+T/LKDGDBxyG4FyoTjk6tHkfk04/BPK
+fGzOxMQ5H0mul4mp+DGYtQrodaZIZHOagQLyjXv3ZnvwAll8p5HlnsswIYDk
+FVQHPM+AS1k/QHfdryP8IAm1isffcLifLgAAKgmPHA==
+       "], {{0, 28}, {28, 0}}, {
+       0, 255},
+       ColorFunction->GrayLevel],
+      BoxForm`ImageTag["Byte", ColorSpace -> Automatic, Interleaving -> None],
+      
+      Selectable->False],
+     DefaultBaseStyle->"ImageGraphics",
+     ImageSizeRaw->{28, 28},
+     PlotRange->{{0, 28}, {0, 28}}], "\[Rule]", "3"}], ",", 
+   RowBox[{
+    GraphicsBox[
+     TagBox[RasterBox[CompressedData["
+1:eJxTTMoPSmNiYGAo5gASQYnljkVFiZXBAkBOaF5xZnpeaopnXklqemqRRRJI
+mQwU/x9gsD8j2usOVpnXlYxAEIxN6p4Bo9mdr19/Ycr8nMhtsvwvdqveM0qe
+x+WMZYzXwPSp7pMYcm0sN/7//7NAlVP8GKac2JP/e70YOTq/YXEl47W/zows
+WO384VNfzij1HLtjbggwMi7D4dDbQoxBb7HKHCzVZ4o0Nz2KRWohKyPj/P8/
+K3mfYEg95WNkzfz8//8n7XYMuQpGBh8g9c2FYw+GnDOj39f/f6uNedZjSN3n
+4j77vliZ2eQ+pktuMTJK8zDGbcXmgR/Nmd7sTd+xSdEPAAC2iMe8
+       "], {{0, 28}, {28,
+        0}}, {0, 255},
+       ColorFunction->GrayLevel],
+      BoxForm`ImageTag["Byte", ColorSpace -> Automatic, Interleaving -> None],
+      
+      Selectable->False],
+     DefaultBaseStyle->"ImageGraphics",
+     ImageSizeRaw->{28, 28},
+     PlotRange->{{0, 28}, {0, 28}}], "\[Rule]", "8"}]}], "}"}]], "Output",
+ CellChangeTimes->{
+  3.721037837105369*^9},ExpressionUUID->"0c458cb6-da62-4e74-a305-\
+64aed8012e8e"]
+}, Open  ]],
+
+Cell["\<\
+For the purposes of this break-out group, I am just interested in the \
+matrices, making it even simpler and flatten it into a vector.\
+\>", "Text",
+ CellChangeTimes->{{3.721037550854125*^9, 3.721037572701038*^9}, {
+  3.721037660967375*^9, 3.721037664574049*^9}, {3.72103799488682*^9, 
+  3.721038018798025*^9}},ExpressionUUID->"85fd4591-bde9-4208-a098-\
+979127b8728e"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"trainingDatasimple", "[", 
+  RowBox[{"[", 
+   RowBox[{"1", ",", "1"}], "]"}], "]"}]], "Input",ExpressionUUID->"84e62b32-\
+0a0e-417f-a710-94117ba2377d"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+  "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "0.8`", ",", "0.3764705882352941`", ",", 
+   "0.00784313725490196`", ",", "0.3764705882352941`", ",", 
+   "0.803921568627451`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "0.8117647058823529`", ",", "0.06666666666666667`", ",", 
+   "0.011764705882352941`", ",", "0.011764705882352941`", ",", 
+   "0.011764705882352941`", ",", "0.07058823529411765`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "0.788235294117647`", ",", "0.10980392156862745`", 
+   ",", "0.00784313725490196`", ",", "0.011764705882352941`", ",", 
+   "0.06274509803921569`", ",", "0.08627450980392157`", ",", 
+   "0.011764705882352941`", ",", "0.7764705882352941`", ",", 
+   "0.9764705882352941`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",",
+    "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "0.9607843137254902`", ",", "0.7647058823529411`", ",", 
+   "0.12156862745098039`", ",", "0.011764705882352941`", ",", 
+   "0.00784313725490196`", ",", "0.011764705882352941`", ",", 
+   "0.20784313725490197`", ",", "0.6705882352941176`", ",", 
+   "0.011764705882352941`", ",", "0.00784313725490196`", ",", 
+   "0.5215686274509804`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",",
+    "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "0.3607843137254902`", ",", "0.011764705882352941`", ",", 
+   "0.011764705882352941`", ",", "0.011764705882352941`", ",", 
+   "0.00784313725490196`", ",", "0.011764705882352941`", ",", 
+   "0.011764705882352941`", ",", "0.6235294117647059`", ",", 
+   "0.25882352941176473`", ",", "0.00784313725490196`", ",", 
+   "0.34509803921568627`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "0.8`", ",", "0.06666666666666667`", ",", "0.00784313725490196`", ",",
+    "0.00784313725490196`", ",", "0.2549019607843137`", ",", 
+   "0.5529411764705883`", ",", "0.00784313725490196`", ",", 
+   "0.10588235294117647`", ",", "0.8156862745098039`", ",", 
+   "0.6901960784313725`", ",", "0.`", ",", "0.3411764705882353`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "0.8117647058823529`", ",", 
+   "0.06666666666666667`", ",", "0.011764705882352941`", ",", 
+   "0.011764705882352941`", ",", "0.2980392156862745`", ",", 
+   "0.9529411764705882`", ",", "0.7058823529411765`", ",", 
+   "0.5254901960784314`", ",", "0.9176470588235294`", ",", "1.`", ",", "1.`", 
+   ",", "0.00784313725490196`", ",", "0.047058823529411764`", ",", 
+   "0.803921568627451`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "0.8509803921568627`", ",", 
+   "0.35294117647058826`", ",", "0.00784313725490196`", ",", 
+   "0.08627450980392157`", ",", "0.1843137254901961`", ",", 
+   "0.6705882352941176`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",",
+    "1.`", ",", "1.`", ",", "0.00784313725490196`", ",", 
+   "0.011764705882352941`", ",", "0.35294117647058826`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "0.9725490196078431`", ",", "0.30196078431372547`", ",", 
+   "0.011764705882352941`", ",", "0.058823529411764705`", ",", 
+   "0.7215686274509804`", ",", "0.9254901960784314`", ",", 
+   "0.8901960784313725`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",",
+    "1.`", ",", "1.`", ",", "0.00784313725490196`", ",", 
+   "0.011764705882352941`", ",", "0.23529411764705882`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "0.7764705882352941`", ",", "0.011764705882352941`", ",", 
+   "0.011764705882352941`", ",", "0.7529411764705882`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "0.00784313725490196`", ",", 
+   "0.011764705882352941`", ",", "0.23529411764705882`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "0.2235294117647059`", ",", "0.00784313725490196`", ",", 
+   "0.2549019607843137`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",",
+    "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "0.`", ",", "0.00784313725490196`", ",", "0.23137254901960785`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "0.7019607843137254`", ",", "0.03529411764705882`", ",", 
+   "0.011764705882352941`", ",", "0.5607843137254902`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "0.00784313725490196`", ",", 
+   "0.011764705882352941`", ",", "0.4196078431372549`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "0.6666666666666666`", ",",
+    "0.011764705882352941`", ",", "0.09803921568627451`", ",", 
+   "0.9019607843137255`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",",
+    "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "0.9725490196078431`", 
+   ",", "0.47058823529411764`", ",", "0.00784313725490196`", ",", 
+   "0.27058823529411763`", ",", "0.9529411764705882`", ",", "1.`", ",", "1.`",
+    ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "1.`", ",", "0.6666666666666666`", ",", 
+   "0.011764705882352941`", ",", "0.12549019607843137`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "0.9725490196078431`", ",", "0.48627450980392156`", ",", 
+   "0.011764705882352941`", ",", "0.11764705882352941`", ",", 
+   "0.7215686274509804`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",",
+    "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "0.6666666666666666`", ",", 
+   "0.011764705882352941`", ",", "0.43137254901960786`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "0.8117647058823529`", ",", "0.35294117647058826`", ",", 
+   "0.011764705882352941`", ",", "0.3215686274509804`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "0.6627450980392157`", ",", "0.00784313725490196`", ",", 
+   "0.11764705882352941`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "0.5529411764705883`", ",", 
+   "0.06666666666666667`", ",", "0.00784313725490196`", ",", 
+   "0.36470588235294116`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "0.6666666666666666`", ",", "0.011764705882352941`", ",", 
+   "0.023529411764705882`", ",", "0.42745098039215684`", ",", 
+   "0.8117647058823529`", ",", "0.8862745098039215`", ",", 
+   "0.6666666666666666`", ",", "0.30196078431372547`", ",", 
+   "0.11764705882352941`", ",", "0.00784313725490196`", ",", 
+   "0.12549019607843137`", ",", "0.34509803921568627`", ",", 
+   "0.7803921568627451`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",",
+    "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", 
+   "0.6666666666666666`", ",", "0.011764705882352941`", ",", 
+   "0.011764705882352941`", ",", "0.011764705882352941`", ",", 
+   "0.10196078431372549`", ",", "0.1568627450980392`", ",", 
+   "0.011764705882352941`", ",", "0.011764705882352941`", ",", 
+   "0.011764705882352941`", ",", "0.23137254901960785`", ",", 
+   "0.49019607843137253`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "0.8901960784313725`", ",", "0.2196078431372549`", ",", 
+   "0.011764705882352941`", ",", "0.011764705882352941`", ",", 
+   "0.00784313725490196`", ",", "0.011764705882352941`", ",", 
+   "0.011764705882352941`", ",", "0.08627450980392157`", ",", 
+   "0.43137254901960786`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "0.9019607843137255`",
+    ",", "0.4980392156862745`", ",", "0.011764705882352941`", ",", 
+   "0.00784313725490196`", ",", "0.011764705882352941`", ",", 
+   "0.4470588235294118`", ",", "0.8549019607843137`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`", 
+   ",", "1.`", ",", "1.`", ",", "1.`", ",", "1.`"}], "}"}]], "Output",
+ CellChangeTimes->{
+  3.7210380288525047`*^9},ExpressionUUID->"9d038d1e-01a4-42a9-951d-\
+dddf5fece65c"]
+}, Closed]],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"trainingDatasimple", "=", 
+   RowBox[{"Table", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"Flatten", "[", 
+       RowBox[{"ImageData", "[", 
+        RowBox[{"trainingData", "[", 
+         RowBox[{"[", 
+          RowBox[{"i", ",", "1"}], "]"}], "]"}], "]"}], "]"}], "\[Rule]", 
+      RowBox[{"trainingData", "[", 
+       RowBox[{"[", 
+        RowBox[{"i", ",", "2"}], "]"}], "]"}]}], ",", 
+     RowBox[{"{", 
+      RowBox[{"i", ",", "1", ",", 
+       RowBox[{"Length", "[", "trainingData", "]"}]}], "}"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"testDatasimple", "=", 
+   RowBox[{"Table", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"Flatten", "[", 
+       RowBox[{"ImageData", "[", 
+        RowBox[{"testData", "[", 
+         RowBox[{"[", 
+          RowBox[{"i", ",", "1"}], "]"}], "]"}], "]"}], "]"}], "\[Rule]", 
+      RowBox[{"testData", "[", 
+       RowBox[{"[", 
+        RowBox[{"i", ",", "2"}], "]"}], "]"}]}], ",", 
+     RowBox[{"{", 
+      RowBox[{"i", ",", "1", ",", 
+       RowBox[{"Length", "[", "testData", "]"}]}], "}"}]}], "]"}]}], 
+  ";"}]}], "Input",ExpressionUUID->"1c032f01-9a8a-4a5f-8b14-af74ca4db44c"],
+
+Cell["\<\
+Let\[CloseCurlyQuote]s define our network, having one linear layer, and one \
+softmaxlayer (to turn it into probabilities).\
+\>", "Text",
+ CellChangeTimes->{{3.72103811361626*^9, 
+  3.721038175008781*^9}},ExpressionUUID->"455c7bc8-fb61-4d2c-8f32-\
+427ce77020ca"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"net2", "=", 
+  RowBox[{"NetChain", "[", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"LinearLayer", "[", "10", "]"}], ",", 
+     RowBox[{"SoftmaxLayer", "[", "]"}]}], "}"}], "]"}]}]], "Input",Expression\
+UUID->"2dd61455-d9b7-4a93-8bb7-0bd6a5f50974"],
+
+Cell[BoxData[
+ StyleBox[
+  TagBox[
+   TagBox[
+    RowBox[{"NetChain", 
+     RowBox[{"[", 
+      PanelBox[
+       DynamicModuleBox[{NeuralNetworks`Private`NetChain`assoc3 = Association[
+        "Type" -> "Chain", "Nodes" -> 
+         Association[
+          "1" -> Association[
+            "Type" -> "Linear", "Arrays" -> 
+             Association[
+              "Weights" -> 
+               NeuralNetworks`TensorT[{10, NeuralNetworks`SizeT}, 
+                 NeuralNetworks`RealT], "Biases" -> NeuralNetworks`Nullable[
+                 NeuralNetworks`TensorT[{10}, NeuralNetworks`RealT]]], 
+             "Parameters" -> 
+             Association[
+              "OutputDimensions" -> {10}, "$OutputSize" -> 10, "$InputSize" -> 
+               NeuralNetworks`SizeT, "$InputDimensions" -> 
+               NeuralNetworks`ListT[
+                NeuralNetworks`NaturalT, NeuralNetworks`SizeT]], "Inputs" -> 
+             Association["Input" -> NeuralNetworks`TensorT[
+                 NeuralNetworks`ListT[
+                 NeuralNetworks`NaturalT, NeuralNetworks`SizeT], 
+                 NeuralNetworks`RealT]], "Outputs" -> 
+             Association[
+              "Output" -> 
+               NeuralNetworks`TensorT[{10}, NeuralNetworks`RealT]]], "2" -> 
+           Association[
+            "Type" -> "Softmax", "Arrays" -> Association[], "Parameters" -> 
+             Association[], "Inputs" -> 
+             Association[
+              "Input" -> NeuralNetworks`TensorT[{10}, NeuralNetworks`RealT]], 
+             "Outputs" -> 
+             Association[
+              "Output" -> 
+               NeuralNetworks`TensorT[{10}, NeuralNetworks`RealT]]]], 
+         "Edges" -> {
+          NeuralNetworks`NetPath["Nodes", "1", "Inputs", "Input"] -> 
+           NeuralNetworks`NetPath["Inputs", "Input"], 
+           NeuralNetworks`NetPath["Nodes", "2", "Inputs", "Input"] -> 
+           NeuralNetworks`NetPath["Nodes", "1", "Outputs", "Output"], 
+           NeuralNetworks`NetPath["Outputs", "Output"] -> 
+           NeuralNetworks`NetPath["Nodes", "2", "Outputs", "Output"]}, 
+         "Inputs" -> Association["Input" -> NeuralNetworks`TensorT[
+             NeuralNetworks`ListT[
+             NeuralNetworks`NaturalT, NeuralNetworks`SizeT], 
+             NeuralNetworks`RealT]], "Outputs" -> 
+         Association[
+          "Output" -> NeuralNetworks`TensorT[{10}, NeuralNetworks`RealT]]], 
+        NeuralNetworks`Private`NetChain`opart, 
+        NeuralNetworks`Private`NetChain`part, 
+        NeuralNetworks`Private`NetChain`selected = Null}, 
+        DynamicBox[GridBox[{{
+            NeuralNetworks`Private`NetChain`MouseClickBoxes[
+             TagBox[
+              GridBox[{{
+                 TagBox[
+                  TagBox[
+                  "\"\"", Annotation[#, {"Inputs", "Input"}, "Mouse"]& ], 
+                  MouseAppearanceTag["LinkHand"]], 
+                 TagBox[
+                  TagBox[
+                  "\"Input\"", Annotation[#, {"Inputs", "Input"}, "Mouse"]& ], 
+                  MouseAppearanceTag["LinkHand"]], 
+                 TagBox[
+                  TagBox[
+                  "\"tensor\"", 
+                   Annotation[#, {"Inputs", "Input"}, "Mouse"]& ], 
+                  MouseAppearanceTag["LinkHand"]]}, {
+                 TagBox[
+                  TagBox[
+                   StyleBox["\"1\"", 
+                    GrayLevel[0.5], StripOnInput -> False], 
+                   Annotation[#, {"Nodes", "1"}, "Mouse"]& ], 
+                  MouseAppearanceTag["LinkHand"]], 
+                 TagBox[
+                  TagBox[
+                   StyleBox["LinearLayer", 
+                    RGBColor[0.66, 0, 0], StripOnInput -> False], 
+                   Annotation[#, {"Nodes", "1"}, "Mouse"]& ], 
+                  MouseAppearanceTag["LinkHand"]], 
+                 TagBox[
+                  TagBox[
+                   TemplateBox[{"\"vector\"", "\" \"", 
+                    StyleBox[
+                    
+                    TemplateBox[{
+                    "\"(\"", "\"\[VeryThinSpace]\"", "\"size\"", "\":\"", 
+                    "\" \"", 
+                    
+                    TemplateBox[{"\[Times]", "\"\[Times]\"", "\"10\""}, 
+                    "RowWithSeparators"], "\"\[VeryThinSpace]\"", "\")\""}, 
+                    "RowDefault"], 
+                    GrayLevel[0.5], StripOnInput -> False]}, "RowDefault"], 
+                   Annotation[#, {"Nodes", "1"}, "Mouse"]& ], 
+                  MouseAppearanceTag["LinkHand"]]}, {
+                 TagBox[
+                  TagBox[
+                   StyleBox["\"2\"", 
+                    GrayLevel[0.5], StripOnInput -> False], 
+                   Annotation[#, {"Nodes", "2"}, "Mouse"]& ], 
+                  MouseAppearanceTag["LinkHand"]], 
+                 TagBox[
+                  TagBox[
+                   StyleBox["SoftmaxLayer", 
+                    GrayLevel[0], StripOnInput -> False], 
+                   Annotation[#, {"Nodes", "2"}, "Mouse"]& ], 
+                  MouseAppearanceTag["LinkHand"]], 
+                 TagBox[
+                  TagBox[
+                   TemplateBox[{"\"vector\"", "\" \"", 
+                    StyleBox[
+                    
+                    TemplateBox[{
+                    "\"(\"", "\"\[VeryThinSpace]\"", "\"size\"", "\":\"", 
+                    "\" \"", 
+                    
+                    TemplateBox[{"\[Times]", "\"\[Times]\"", "\"10\""}, 
+                    "RowWithSeparators"], "\"\[VeryThinSpace]\"", "\")\""}, 
+                    "RowDefault"], 
+                    GrayLevel[0.5], StripOnInput -> False]}, "RowDefault"], 
+                   Annotation[#, {"Nodes", "2"}, "Mouse"]& ], 
+                  MouseAppearanceTag["LinkHand"]]}, {
+                 TagBox[
+                  TagBox[
+                  "\"\"", Annotation[#, {"Outputs", "Output"}, "Mouse"]& ], 
+                  MouseAppearanceTag["LinkHand"]], 
+                 TagBox[
+                  TagBox[
+                  "\"Output\"", 
+                   Annotation[#, {"Outputs", "Output"}, "Mouse"]& ], 
+                  MouseAppearanceTag["LinkHand"]], 
+                 TagBox[
+                  TagBox[
+                   TemplateBox[{"\"vector\"", "\" \"", 
+                    StyleBox[
+                    
+                    TemplateBox[{
+                    "\"(\"", "\"\[VeryThinSpace]\"", "\"size\"", "\":\"", 
+                    "\" \"", 
+                    
+                    TemplateBox[{"\[Times]", "\"\[Times]\"", "\"10\""}, 
+                    "RowWithSeparators"], "\"\[VeryThinSpace]\"", "\")\""}, 
+                    "RowDefault"], 
+                    GrayLevel[0.5], StripOnInput -> False]}, "RowDefault"], 
+                   Annotation[#, {"Outputs", "Output"}, "Mouse"]& ], 
+                  MouseAppearanceTag["LinkHand"]]}, {
+                 ItemBox[
+                  StyleBox["\"(uninitialized)\"", 
+                   RGBColor[0.66, 0, 0], Small, StripOnInput -> False], 
+                  Alignment -> Center, StripOnInput -> False], 
+                 "\[SpanFromLeft]", "\[SpanFromLeft]"}}, 
+               GridBoxAlignment -> {"Columns" -> {{Left}}}, AutoDelete -> 
+               False, GridBoxItemSize -> {
+                "Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}, 
+               GridBoxSpacings -> {"Columns" -> {{1.1}}}], "Grid"], 
+             If[
+              ListQ[NeuralNetworks`Private`NetChain`part = MouseAnnotation[]],
+               If[NeuralNetworks`Private`NetChain`opart === 
+                NeuralNetworks`Private`NetChain`part, 
+                NeuralNetworks`Private`NetChain`selected = Null; 
+                NeuralNetworks`Private`NetChain`opart = Null, 
+                NeuralNetworks`Private`NetChain`selected = 
+                 Part[NeuralNetworks`Private`NetChain`assoc3, 
+                   Apply[Sequence, NeuralNetworks`Private`NetChain`part]]; 
+                NeuralNetworks`Private`NetChain`opart = 
+                 NeuralNetworks`Private`NetChain`part; Null]; Null]]}, 
+           NeuralNetworks`Private`NetChain`fmtSelected[
+           NeuralNetworks`Private`NetChain`selected, 
+            NeuralNetworks`Private`NetChain`part]}, 
+          GridBoxSpacings -> {"Columns" -> {{1}}}, 
+          GridBoxAlignment -> {"Columns" -> {{Left}}}],
+         ImageSizeCache->{168., {32.4169921875, 37.5830078125}},
+         TrackedSymbols:>{NeuralNetworks`Private`NetChain`selected}],
+        Initialization:>{NetChain}],
+       BaselinePosition->Automatic], "]"}]}],
+    False],
+   Deploy],
+  LineBreakWithin->False]], "Output",
+ CellChangeTimes->{
+  3.721038102698139*^9},ExpressionUUID->"57bbd7b0-3aa1-4d52-b93e-\
+0f009b3b0c5f"]
+}, Open  ]],
+
+Cell["Let\[CloseCurlyQuote]s train the network:", "Text",
+ CellChangeTimes->{{3.721038200831003*^9, 
+  3.721038207542624*^9}},ExpressionUUID->"d8d82ddd-7d89-4afb-9950-\
+4e54da76c959"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"net2", "=", 
+  RowBox[{"NetTrain", "[", 
+   RowBox[{"net2", ",", "trainingDatasimple", ",", 
+    RowBox[{"ValidationSet", "\[Rule]", "testDatasimple"}], ",", 
+    RowBox[{"MaxTrainingRounds", "\[Rule]", "3"}]}], "]"}]}]], "Input",Express\
+ionUUID->"4711b049-be4a-44ce-bfd9-04ee116f9885"],
+
+Cell[BoxData[
+ StyleBox[
+  TagBox[
+   TagBox[
+    RowBox[{"NetChain", 
+     RowBox[{"[", 
+      PanelBox[
+       DynamicModuleBox[{NeuralNetworks`Private`NetChain`assoc3 = Association[
+        "Type" -> "Chain", "Nodes" -> 
+         Association[
+          "1" -> Association[
+            "Type" -> "Linear", "Arrays" -> 
+             Association[
+              "Weights" -> NeuralNetworks`Private`DummyRawArray[{10, 784}], 
+               "Biases" -> NeuralNetworks`Private`DummyRawArray[{10}]], 
+             "Parameters" -> 
+             Association[
+              "OutputDimensions" -> {10}, "$OutputSize" -> 10, "$InputSize" -> 
+               784, "$InputDimensions" -> {784}], "Inputs" -> 
+             Association[
+              "Input" -> NeuralNetworks`TensorT[{784}, NeuralNetworks`RealT]],
+              "Outputs" -> 
+             Association[
+              "Output" -> 
+               NeuralNetworks`TensorT[{10}, NeuralNetworks`RealT]]], "2" -> 
+           Association[
+            "Type" -> "Softmax", "Arrays" -> Association[], "Parameters" -> 
+             Association[], "Inputs" -> 
+             Association[
+              "Input" -> NeuralNetworks`TensorT[{10}, NeuralNetworks`RealT]], 
+             "Outputs" -> 
+             Association[
+              "Output" -> 
+               NeuralNetworks`TensorT[{10}, NeuralNetworks`RealT]]]], 
+         "Edges" -> {
+          NeuralNetworks`NetPath["Nodes", "1", "Inputs", "Input"] -> 
+           NeuralNetworks`NetPath["Inputs", "Input"], 
+           NeuralNetworks`NetPath["Nodes", "2", "Inputs", "Input"] -> 
+           NeuralNetworks`NetPath["Nodes", "1", "Outputs", "Output"], 
+           NeuralNetworks`NetPath["Outputs", "Output"] -> 
+           NeuralNetworks`NetPath["Nodes", "2", "Outputs", "Output"]}, 
+         "Inputs" -> 
+         Association[
+          "Input" -> NeuralNetworks`TensorT[{784}, NeuralNetworks`RealT]], 
+         "Outputs" -> Association["Output" -> NetDecoder["Class", 
+             Association[
+             "Labels" -> {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, "Dimensions" -> 10], 
+             
+             NeuralNetworks`TensorT[{10}, NeuralNetworks`RealT]]]], 
+        NeuralNetworks`Private`NetChain`opart, 
+        NeuralNetworks`Private`NetChain`part, 
+        NeuralNetworks`Private`NetChain`selected = Null}, 
+        DynamicBox[GridBox[{{
+            NeuralNetworks`Private`NetChain`MouseClickBoxes[
+             TagBox[
+              GridBox[{{
+                 TagBox[
+                  TagBox[
+                  "\"\"", Annotation[#, {"Inputs", "Input"}, "Mouse"]& ], 
+                  MouseAppearanceTag["LinkHand"]], 
+                 TagBox[
+                  TagBox[
+                  "\"Input\"", Annotation[#, {"Inputs", "Input"}, "Mouse"]& ], 
+                  MouseAppearanceTag["LinkHand"]], 
+                 TagBox[
+                  TagBox[
+                   TemplateBox[{"\"vector\"", "\" \"", 
+                    StyleBox[
+                    
+                    TemplateBox[{
+                    "\"(\"", "\"\[VeryThinSpace]\"", "\"size\"", "\":\"", 
+                    "\" \"", 
+                    
+                    TemplateBox[{"\[Times]", "\"\[Times]\"", "\"784\""}, 
+                    "RowWithSeparators"], "\"\[VeryThinSpace]\"", "\")\""}, 
+                    "RowDefault"], 
+                    GrayLevel[0.5], StripOnInput -> False]}, "RowDefault"], 
+                   Annotation[#, {"Inputs", "Input"}, "Mouse"]& ], 
+                  MouseAppearanceTag["LinkHand"]]}, {
+                 TagBox[
+                  TagBox[
+                   StyleBox["\"1\"", 
+                    GrayLevel[0.5], StripOnInput -> False], 
+                   Annotation[#, {"Nodes", "1"}, "Mouse"]& ], 
+                  MouseAppearanceTag["LinkHand"]], 
+                 TagBox[
+                  TagBox[
+                   StyleBox["LinearLayer", 
+                    GrayLevel[0], StripOnInput -> False], 
+                   Annotation[#, {"Nodes", "1"}, "Mouse"]& ], 
+                  MouseAppearanceTag["LinkHand"]], 
+                 TagBox[
+                  TagBox[
+                   TemplateBox[{"\"vector\"", "\" \"", 
+                    StyleBox[
+                    
+                    TemplateBox[{
+                    "\"(\"", "\"\[VeryThinSpace]\"", "\"size\"", "\":\"", 
+                    "\" \"", 
+                    
+                    TemplateBox[{"\[Times]", "\"\[Times]\"", "\"10\""}, 
+                    "RowWithSeparators"], "\"\[VeryThinSpace]\"", "\")\""}, 
+                    "RowDefault"], 
+                    GrayLevel[0.5], StripOnInput -> False]}, "RowDefault"], 
+                   Annotation[#, {"Nodes", "1"}, "Mouse"]& ], 
+                  MouseAppearanceTag["LinkHand"]]}, {
+                 TagBox[
+                  TagBox[
+                   StyleBox["\"2\"", 
+                    GrayLevel[0.5], StripOnInput -> False], 
+                   Annotation[#, {"Nodes", "2"}, "Mouse"]& ], 
+                  MouseAppearanceTag["LinkHand"]], 
+                 TagBox[
+                  TagBox[
+                   StyleBox["SoftmaxLayer", 
+                    GrayLevel[0], StripOnInput -> False], 
+                   Annotation[#, {"Nodes", "2"}, "Mouse"]& ], 
+                  MouseAppearanceTag["LinkHand"]], 
+                 TagBox[
+                  TagBox[
+                   TemplateBox[{"\"vector\"", "\" \"", 
+                    StyleBox[
+                    
+                    TemplateBox[{
+                    "\"(\"", "\"\[VeryThinSpace]\"", "\"size\"", "\":\"", 
+                    "\" \"", 
+                    
+                    TemplateBox[{"\[Times]", "\"\[Times]\"", "\"10\""}, 
+                    "RowWithSeparators"], "\"\[VeryThinSpace]\"", "\")\""}, 
+                    "RowDefault"], 
+                    GrayLevel[0.5], StripOnInput -> False]}, "RowDefault"], 
+                   Annotation[#, {"Nodes", "2"}, "Mouse"]& ], 
+                  MouseAppearanceTag["LinkHand"]]}, {
+                 TagBox[
+                  TagBox[
+                  "\"\"", Annotation[#, {"Outputs", "Output"}, "Mouse"]& ], 
+                  MouseAppearanceTag["LinkHand"]], 
+                 TagBox[
+                  TagBox[
+                  "\"Output\"", 
+                   Annotation[#, {"Outputs", "Output"}, "Mouse"]& ], 
+                  MouseAppearanceTag["LinkHand"]], 
+                 TagBox[
+                  TagBox[
+                  "\"class\"", 
+                   Annotation[#, {"Outputs", "Output"}, "Mouse"]& ], 
+                  MouseAppearanceTag["LinkHand"]]}}, 
+               GridBoxAlignment -> {"Columns" -> {{Left}}}, AutoDelete -> 
+               False, GridBoxItemSize -> {
+                "Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}, 
+               GridBoxSpacings -> {"Columns" -> {{1.1}}}], "Grid"], 
+             If[
+              ListQ[NeuralNetworks`Private`NetChain`part = MouseAnnotation[]],
+               If[
+               NeuralNetworks`Private`NetChain`opart === 
+                NeuralNetworks`Private`NetChain`part, 
+                NeuralNetworks`Private`NetChain`selected = Null; 
+                NeuralNetworks`Private`NetChain`opart = Null, 
+                NeuralNetworks`Private`NetChain`selected = 
+                 Part[NeuralNetworks`Private`NetChain`assoc3, 
+                   Apply[Sequence, NeuralNetworks`Private`NetChain`part]]; 
+                NeuralNetworks`Private`NetChain`opart = 
+                 NeuralNetworks`Private`NetChain`part; Null]; Null]]}, 
+           NeuralNetworks`Private`NetChain`fmtSelected[
+           NeuralNetworks`Private`NetChain`selected, 
+            NeuralNetworks`Private`NetChain`part]}, 
+          GridBoxSpacings -> {"Columns" -> {{1}}}, 
+          GridBoxAlignment -> {"Columns" -> {{Left}}}],
+         ImageSizeCache->{176., {25.4169921875, 30.5830078125}},
+         TrackedSymbols:>{NeuralNetworks`Private`NetChain`selected}],
+        Initialization:>{NetChain}],
+       BaselinePosition->Automatic], "]"}]}],
+    False],
+   Deploy],
+  LineBreakWithin->False]], "Output",
+ CellChangeTimes->{
+  3.72103826126763*^9},ExpressionUUID->"ffe30efc-88f9-4a91-8077-be26a4ff4686"]
+}, Open  ]],
+
+Cell["Let\[CloseCurlyQuote]s see how well we are doing:", "Text",
+ CellChangeTimes->{{3.721038345376954*^9, 3.7210383470880527`*^9}, {
+   3.721038541981769*^9, 3.72103854591749*^9}, 
+   3.721038641547977*^9},ExpressionUUID->"0e605f6b-fcb5-4cac-81fa-\
+24f9f2ad449d"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"j", "=", "0"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"Do", "[", 
+  RowBox[{
+   RowBox[{"If", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"net2", "[", 
+       RowBox[{"testDatasimple", "[", 
+        RowBox[{"[", 
+         RowBox[{"i", ",", "1"}], "]"}], "]"}], "]"}], "\[Equal]", 
+      RowBox[{"testDatasimple", "[", 
+       RowBox[{"[", 
+        RowBox[{"i", ",", "2"}], "]"}], "]"}]}], ",", 
+     RowBox[{"j", "=", 
+      RowBox[{"j", "+", "1"}]}]}], "]"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"i", ",", "1", ",", 
+     RowBox[{"Length", "[", "testDatasimple", "]"}]}], "}"}]}], 
+  "]"}], "\[IndentingNewLine]", 
+ RowBox[{"N", "[", 
+  RowBox[{"j", "/", 
+   RowBox[{"Length", "[", "testDatasimple", "]"}]}], "]"}]}], "Input",
+ CellChangeTimes->{{3.7210383353219*^9, 3.721038340769472*^9}, {
+  3.721038649781855*^9, 
+  3.721038651804695*^9}},ExpressionUUID->"f9dab3fd-1275-48fd-9bb7-\
+58dcf48ba7c5"],
+
+Cell[BoxData["0.9004`"], "Output",
+ CellChangeTimes->{{3.721038645175994*^9, 
+  3.7210386544202833`*^9}},ExpressionUUID->"ed838951-84c6-4742-bff9-\
+07359e6959c8"]
+}, Open  ]],
+
+Cell["We are doing quite well.", "Text",
+ CellChangeTimes->{{3.721038876982566*^9, 
+  3.72103888129352*^9}},ExpressionUUID->"87270d96-edb2-42c0-aa65-\
+560d0a46770f"]
+}, Open  ]]
+},
+Evaluator->"K02",
+WindowSize->{808, 755},
+WindowMargins->{{12, Automatic}, {Automatic, 24}},
+FrontEndVersion->"11.2 for Mac OS X x86 (32-bit, 64-bit Kernel) (September \
+10, 2017)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[580, 22, 202, 3, 160, "Title",ExpressionUUID->"d299117a-2b33-492f-82b8-2b4b68a8cea5"],
+Cell[785, 27, 523, 14, 52, "Input",ExpressionUUID->"bb7cf3cf-0701-4cf3-97a1-138326ded789"],
+Cell[CellGroupData[{
+Cell[1333, 45, 156, 3, 30, "Input",ExpressionUUID->"8d3be260-db7d-4b1f-93ba-616bffc3710e"],
+Cell[1492, 50, 3645, 90, 47, "Output",ExpressionUUID->"0c458cb6-da62-4e74-a305-64aed8012e8e"]
+}, Open  ]],
+Cell[5152, 143, 378, 7, 58, "Text",ExpressionUUID->"85fd4591-bde9-4208-a098-979127b8728e"],
+Cell[CellGroupData[{
+Cell[5555, 154, 175, 4, 30, "Input",ExpressionUUID->"84e62b32-0a0e-417f-a710-94117ba2377d"],
+Cell[5733, 160, 13199, 188, 1064, "Output",ExpressionUUID->"9d038d1e-01a4-42a9-951d-dddf5fece65c"]
+}, Closed]],
+Cell[18947, 351, 1190, 34, 111, "Input",ExpressionUUID->"1c032f01-9a8a-4a5f-8b14-af74ca4db44c"],
+Cell[20140, 387, 272, 6, 35, "Text",ExpressionUUID->"455c7bc8-fb61-4d2c-8f32-427ce77020ca"],
+Cell[CellGroupData[{
+Cell[20437, 397, 272, 7, 30, "Input",ExpressionUUID->"2dd61455-d9b7-4a93-8bb7-0bd6a5f50974"],
+Cell[20712, 406, 8658, 184, 108, "Output",ExpressionUUID->"57bbd7b0-3aa1-4d52-b93e-0f009b3b0c5f"]
+}, Open  ]],
+Cell[29385, 593, 183, 3, 35, "Text",ExpressionUUID->"d8d82ddd-7d89-4afb-9950-4e54da76c959"],
+Cell[CellGroupData[{
+Cell[29593, 600, 311, 6, 52, "Input",ExpressionUUID->"4711b049-be4a-44ce-bfd9-04ee116f9885"],
+Cell[29907, 608, 8158, 176, 94, "Output",ExpressionUUID->"ffe30efc-88f9-4a91-8077-be26a4ff4686"]
+}, Open  ]],
+Cell[38080, 787, 265, 4, 35, "Text",ExpressionUUID->"0e605f6b-fcb5-4cac-81fa-24f9f2ad449d"],
+Cell[CellGroupData[{
+Cell[38370, 795, 940, 27, 94, "Input",ExpressionUUID->"f9dab3fd-1275-48fd-9bb7-58dcf48ba7c5"],
+Cell[39313, 824, 162, 3, 34, "Output",ExpressionUUID->"ed838951-84c6-4742-bff9-07359e6959c8"]
+}, Open  ]],
+Cell[39490, 830, 165, 3, 35, "Text",ExpressionUUID->"87270d96-edb2-42c0-aa65-560d0a46770f"]
+}, Open  ]]
+}
+]
+*)
+
