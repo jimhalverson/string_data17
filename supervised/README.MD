@@ -12,6 +12,8 @@ Classify data in two classes for problems like this:
 
 The notebooks (notebook01.nb-notebook03.nb) give an example of Support Vector Machines applied to the classification problems shown in the images above.
 
+In notebook04.nb I give an example of handwritten digit classification using a simple neural network.
+
 ## Software
 
 Currently this is based on Mathematica. Some features will require v.11.1.1.0 or higher. I have also uploaded a .pdf of the respective notebooks in case Mathematica is not available on your machine.
