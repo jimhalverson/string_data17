@@ -216,8 +216,8 @@ class GameEnv:
         a = np.zeros([self.sizeY + 2, self.sizeX + 2, 4])
         a[0:, 0, 3] = 1  # left wall
         a[0, 0:, 3] = 1  # top wall
-        a[0:, 10, 3] = 1  # right wall
-        a[10, 0:, 3] = 1  # bottom wall
+        a[0:, self.sizeY + 1, 3] = 1  # right wall
+        a[self.sizeX + 1, 0:, 3] = 1  # bottom wall
         a[1:-1, 1:-1, :] = 1
         for item in self.objects:
             if a[item.y + 1, item.x + 1, 0] == 1 and a[item.y + 1, item.x + 1, 1] == 1 and a[item.y + 1, item.x + 1, 2] == 1:  # is completely white
