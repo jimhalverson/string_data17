@@ -48,7 +48,7 @@ for s in all_states:
         Q[s][a] = 0.0
 
 gamma = 0.9  # discount factor
-alpha_W = 0.1  # update weighting
+alpha_W = 0.1  # learning rate
 t = 1.0  # count time
 
 ########################################################################################################################
